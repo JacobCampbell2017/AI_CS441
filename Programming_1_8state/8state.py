@@ -56,6 +56,23 @@ def is_solvable(state):
     '''determines if the puzzle is solvable'''
     inversions = 0
 
+    for i in range(3):
+        for j in range(3):
+            for k in range(i, 3):
+                start = 0
+                if k == i:
+                    start = j
+                for l in range(start, 3):
+                    if state[i][j] != 0 and state[k][l] != 0 and state[i][j] > state[k][l]:
+                        # print(state[i][j], " > ", state[k][l])
+                        inversions += 1
+
+    # print("Inversions: ", inversions)
+    if inversions % 2 == 0:
+        return True
+    else:
+        return False
+
 
 def main():
     '''main function'''
