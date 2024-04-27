@@ -18,3 +18,55 @@ If the number of inversions is even, the puzzle is solvable. If the number of in
 
 The agent will solve the puzzle by using the A* algorithm with the hueristic that achieves the highest accuracy.
 '''
+
+import random
+import time
+
+SOLVED_STATE1 = [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
+###############################
+### Non-essential functions ###
+###############################
+
+
+def randomize_state(state):
+    '''randomizes the state of the puzzle'''
+    nums = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    random.shuffle(nums)
+    for i in range(3):
+        for j in range(3):
+            state[i][j] = nums.pop()
+    return state
+
+
+def display_state(state):
+    print("-------")
+    for i in range(3):
+        print("|", end="")
+        for j in range(3):
+            print(state[i][j], end="|")
+        print("\n-------")
+
+###############################
+##### Essential Functions #####
+###############################
+
+
+def is_solvable(state):
+    '''determines if the puzzle is solvable'''
+    inversions = 0
+
+
+def main():
+    '''main function'''
+    random.seed(time.time())
+
+    state = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    state = randomize_state(state)
+
+    is_solvable(state)
+    display_state(state)
+
+
+if __name__ == "__main__":
+    main()
