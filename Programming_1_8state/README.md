@@ -46,6 +46,7 @@ INITIAL              GOAL               HEURISTIC
 ## Output
 
 - The solution path will be displayed in the terminal or saved to a text file.
+- In the solution path, the blank tile is represented by 0 rather than "b".
 - If saved to a .txt file, the filename depends on the input, output, heuristic function, and algorithm used. In order of precedence (separator is "\-"):
 
   1. If it A\* Algorithm is used, the filename will be prefixed with "A_STAR".
@@ -111,6 +112,8 @@ Solution found!
 [1, 3, 4, 6, 7, 0, 2, 5, 8]
 ...
 ```
+
+**Notice the 0 in the text mode output, this is the blank tile.**
 
 ## Note
 

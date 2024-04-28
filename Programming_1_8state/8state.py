@@ -230,7 +230,7 @@ def parse_input(user_input):
     inital_state = []
     goal_state = []
     # Check if the input is valid
-    user_input1, user_input2, heuristic_val = user_input.split(' ')
+    user_input1, user_input2, heuristic_val = user_input.rstrip().split(' ')
     if len(user_input1) != 19 or len(user_input2) != 19:
         print('Invalid length, ensure no spaces between numbers and commas.')
         return None
@@ -463,9 +463,9 @@ def is_solvable(i_state, g_state):
             if i_state[i] == 0 or i_state[j] == 0 or g_state[i] == 0 or g_state[j] == 0:
                 continue
             if i_state[i] > i_state[j]:
-                inversions1 += 1
+                inversions1 += 2
             if g_state[i] > g_state[j]:
-                inversions2 += 1
+                inversions2 += 2
     if inversions1 % 2 == inversions2 % 2:
         return True
     return False
