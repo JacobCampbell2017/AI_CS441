@@ -229,13 +229,8 @@ def parse_input(user_input):
 
     inital_state = []
     goal_state = []
-    flag = False
     # Check if the input is valid
-    try:
-        user_input1, user_input2, heuristic_val, check = user_input.split(' ')
-    except:
-        user_input1, user_input2, heuristic_val = user_input.split(' ')
-        check = 'n'
+    user_input1, user_input2, heuristic_val = user_input.split(' ')
     if len(user_input1) != 19 or len(user_input2) != 19:
         print('Invalid length, ensure no spaces between numbers and commas.')
         return None
@@ -264,9 +259,7 @@ def parse_input(user_input):
     if int(heuristic_val) < 1 or int(heuristic_val) > 3:
         print('Invalid heuristic value. Must be 1, 2, or 3.')
         return None
-    if check == 'v':
-        flag = True
-    return (inital_state, goal_state, int(heuristic_val), flag)
+    return (inital_state, goal_state, int(heuristic_val))
 
 
 def best_search_loop():
@@ -274,6 +267,7 @@ def best_search_loop():
     loop for best search algorithm
     '''
     terminal = 'terminal'
+    visual = False
     while True:
         # Get user input
         # Wrap explanation text in a box
@@ -282,9 +276,8 @@ def best_search_loop():
             'Enter the initial state and goal state and Heuristic function (1,2,3): [q to quit to menu] ')
         print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1')
         print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 2')
-        print('If you want the visualization of the puzzle in the saved file, please end input with "v"')
         print(
-            f'Currently printing to {terminal} (\'f\' to toggle file output)')
+            f'Currently printing to {terminal} (\'f\' to toggle file output) in {"visual" if visual else "text"} mode (\'v\' to toggle visual mode)')
         print('+-' + '-'*36 + '-+')
         user_input = input('Input: ')
         if user_input == 'f':
@@ -293,6 +286,9 @@ def best_search_loop():
             else:
                 terminal = 'terminal'
             continue
+        if user_input == 'v':
+            visual = not visual
+            continue
         if user_input == 'q':
             return
         states = parse_input(user_input)
@@ -300,7 +296,6 @@ def best_search_loop():
             continue
         goal_state = states[1]
         heuristic_val = states[2]
-        flag = states[3]
         initial_state = State(states[0], None, goal_state, None)
 
         if not is_solvable(initial_state.state, goal_state):
@@ -329,8 +324,8 @@ def best_search_loop():
 
             print('Solution found!')
             if terminal == 'file':
-                if flag:
-                    file_name = 'visual_' + file_name
+                if visual:
+                    file_name = 'visual-' + file_name
 
                     if os.path.exists(file_name):
                         os.remove(file_name)
@@ -352,8 +347,12 @@ def best_search_loop():
                                 str(len(path)-1) + ' steps.')
                 print('Solution saved to', file_name)
             else:
-                for i in range(len(path)):
-                    print_state(path[i].state)
+                if visual:
+                    for i in range(len(path)):
+                        print_state(path[i].state)
+                else:
+                    for i in range(len(path)):
+                        print(path[i].state)
             print('Solution found in', len(path)-1, 'steps.')
             print('')
 
@@ -366,15 +365,15 @@ def A_star_loop():
     but I got lazy and didn't want to take longer to do it.
     '''
     terminal = 'terminal'
+    visual = False
     while True:
         print('\n+' + '-'*38 + '+')
         print(
             'Enter the initial state and goal state and Heuristic function (1,2,3): [q to quit to menu] ')
         print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1')
         print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 2')
-        print('If you want the visualization of the puzzle in the saved file, please end input with "v"')
         print(
-            f'Currently printing to {terminal} (\'f\' to toggle file output)')
+            f'Currently printing to {terminal} (\'f\' to toggle file output) in {"visual" if visual else "text"} mode (\'v\' to toggle visual mode)')
         print('+-' + '-'*36 + '-+')
         user_input = input('Input: ')
         if user_input == 'f':
@@ -383,6 +382,9 @@ def A_star_loop():
             else:
                 terminal = 'terminal'
             continue
+        if user_input == 'v':
+            visual = not visual
+            continue
         if user_input == 'q':
             return
         states = parse_input(user_input)
@@ -390,7 +392,6 @@ def A_star_loop():
             continue
         goal_state = states[1]
         heuristic_val = states[2]
-        flag = states[3]
         initial_state = State(states[0], None, goal_state, None)
 
         if not is_solvable(initial_state.state, goal_state):
@@ -411,7 +412,7 @@ def A_star_loop():
             continue
         else:
             '''Save the solution to a txt file'''
-            file_name = 'A_STAR_' + str(initial_state.state).strip(
+            file_name = 'A_STAR-' + str(initial_state.state).strip(
                 '[]').replace(',', '').replace(' ', '')
             file_name += '-' + \
                 str(goal_state).strip('[]').replace(',', '').replace(' ', '')
@@ -419,8 +420,8 @@ def A_star_loop():
 
             print('Solution found!')
             if terminal == 'file':
-                if flag:
-                    file_name = 'visual_' + file_name
+                if visual:
+                    file_name = 'visual-' + file_name
 
                     if os.path.exists(file_name):
                         os.remove(file_name)
@@ -442,7 +443,7 @@ def A_star_loop():
                                 str(len(path)-1) + ' steps.')
                 print('Solution saved to', file_name)
             else:
-                if flag:
+                if visual:
                     for i in range(len(path)):
                         print_state(path[i].state)
                 else:

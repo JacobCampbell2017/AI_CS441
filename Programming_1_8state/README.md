@@ -22,25 +22,95 @@ This Python script provides a solution for the 8 state puzzle, a variant of the 
 5. The solution will be displayed in the terminal or saved to a text file, based on the chosen output mode.
 6. 'q' will exit from algorithm loops to main menu, and will exit program if in main menu.
 7. 'f' inside the algorithm will switch solutions from being displayed in the terminal to displayed in .txt files.
+8. 'v' inside the algorithm will switch solutions from being displayed in text format to visual format (3x3 grid).
 
 ## Input Format
 
 - Initial state and goal state: Two lists of 8 integers from 1 to 8, where "b" represents the blank tile.
+- The lists should be enclosed in parentheses and separated by a space.
+- The Initial state is the first list, and the goal state is the second list.
 - Heuristic function: Choose 1, 2, or 3.
-- If you want a better visual representation of the puzzle state and the solutions, append 'v' to the end of the input.
 
 Example inputs:
 
 ```bash
+INITIAL              GOAL               HEURISTIC
 (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1
-(7,2,4,5,b,6,8,3,1) (b,1,2,3,4,5,6,7,8) 2 v
+-----------------------------------------
+(7,2,4,5,b,6,8,3,1) (b,1,2,3,4,5,6,7,8) 2
+-----------------------------------------
 (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 3
+-----------------------------------------
 ```
 
 ## Output
 
 - The solution path will be displayed in the terminal or saved to a text file.
-- If saved to a file, the filename format is: `initial_state-goal_state-Heuristic.txt`.
+- If saved to a .txt file, the filename depends on the input, output, heuristic function, and algorithm used. In order of precedence (separator is "\-"):
+
+  1. If it A\* Algorithm is used, the filename will be prefixed with "A_STAR".
+  2. if it is Visual mode, the filename will be prefixed with "visual".
+  3. Input state in continuous format, with the blank tile represented by 0.
+  4. Output state in continuous format, with the blank tile represented by 0.
+  5. The heuristic function used. (1, 2, or 3)
+
+Example output filenames:
+best_search example:
+
+```bash
+Currently printing to file ('f' to toggle terminal output) in text mode ('v' to toggle visual mode)
+Input: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1
+Solution found!
+Solution saved to 134678250-123456780-1.txt
+Solution found in 44 steps.
+```
+
+A\* example:
+
+```bash
+Currently printing to file ('f' to toggle terminal output) in visual mode ('v' to toggle visual mode)
+Input: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 3
+Solution found!
+Solution saved to visual-A_STAR-134678250-123456780-3.txt
+Solution found in 22 steps.
+```
+
+## Visual Mode
+
+When the visual mode is enabled, the puzzle state will be displayed in a 3x3 grid format. The blank tile is represented by "b".
+
+Example:
+
+### Visual Mode Output
+
+```bash
+Currently printing to terminal ('f' to toggle file output) in visual mode ('v' to toggle visual mode)
+Input: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1
+Solution found!
++-------+
+| 1 3 4 |
+| 6 7 8 |
+| 2 5 b |
++-------+
++-------+
+| 1 3 4 |
+| 6 7 b |
+| 2 5 8 |
++-------+
+
+...
+```
+
+### Text Mode Output
+
+```bash
+Currently printing to terminal ('f' to toggle file output) in text mode ('v' to toggle visual mode)
+Input: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1
+Solution found!
+[1, 3, 4, 6, 7, 8, 2, 5, 0]
+[1, 3, 4, 6, 7, 0, 2, 5, 8]
+...
+```
 
 ## Note
 
