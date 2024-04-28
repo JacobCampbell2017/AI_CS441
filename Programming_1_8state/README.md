@@ -16,13 +16,17 @@ This Python script provides a solution for the 8 state puzzle, a variant of the 
 ## Usage
 
 1. Run the script.
+
+```bash
+python3 8state.py
+```
+
 2. Choose the algorithm: Best Search (1) or A\* Algorithm (2).
 3. Enter the initial state and goal state of the puzzle, along with the desired heuristic function (1, 2, or 3).
-4. Optionally, include "v" at the end of the input to save the visual representation of the puzzle in the file.
-5. The solution will be displayed in the terminal or saved to a text file, based on the chosen output mode.
-6. 'q' will exit from algorithm loops to main menu, and will exit program if in main menu.
-7. 'f' inside the algorithm will switch solutions from being displayed in the terminal to displayed in .txt files.
-8. 'v' inside the algorithm will switch solutions from being displayed in text format to visual format (3x3 grid).
+4. The solution will be displayed in the terminal or saved to a text file, based on the chosen output mode.
+5. 'q' will exit from algorithm loops to main menu, and will exit program if in main menu.
+6. 'f' inside the algorithm will switch solutions from being displayed in the terminal to displayed in .txt files.
+7. 'v' inside the algorithm will switch solutions from being displayed in text format to visual format (3x3 grid).
 
 ## Input Format
 
