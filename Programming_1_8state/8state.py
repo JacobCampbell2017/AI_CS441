@@ -17,7 +17,10 @@ If the number of inversions is even, the puzzle is solvable. If the number of in
 
 The agent will solve the puzzle by using the A* algorithm with the heuristic that achieves the highest accuracy.
 
-The solution will be saved in a txt file named after the initial_state-goal_state-Heuristic.txt
+The solution can be saved in a txt file named after the initial_state-goal_state-Heuristic.txt
+There is an option to save the visual representation of the puzzle in the file by ending the input with "v"
+
+If the user doesn't toggle the file output, the solution will be printed to the terminal by default.
 '''
 
 import random
@@ -30,12 +33,13 @@ import os
 
 
 class State:
-    def __init__(self, state, parent=None, g=0, h=0):
+    def __init__(self, state, parent=None, g=0, h=0, c=0):
         self.state = state
         self.parent = parent
         self.goal = g
         self.heuristic = h
         self.next_states = []
+        self.cost = c
 
     def find_next_states(self):
         '''Finds the next possible states from the current state'''
@@ -54,28 +58,28 @@ class State:
         new_state = self.state.copy()
         new_state[blank] = new_state[blank-1]
         new_state[blank-1] = 0
-        return State(new_state, parent=self, g=self.goal)
+        return State(new_state, parent=self, g=self.goal, c=self.cost + 1)
 
     def move_right(self, blank):
         '''Moves the blank tile right'''
         new_state = self.state.copy()
         new_state[blank] = new_state[blank+1]
         new_state[blank+1] = 0
-        return State(new_state, parent=self, g=self.goal)
+        return State(new_state, parent=self, g=self.goal, c=self.cost + 1)
 
     def move_up(self, blank):
         '''Moves the blank tile up'''
         new_state = self.state.copy()
         new_state[blank] = new_state[blank-3]
         new_state[blank-3] = 0
-        return State(new_state, parent=self, g=self.goal)
+        return State(new_state, parent=self, g=self.goal, c=self.cost + 1)
 
     def move_down(self, blank):
         '''Moves the blank tile down'''
         new_state = self.state.copy()
         new_state[blank] = new_state[blank+3]
         new_state[blank+3] = 0
-        return State(new_state, parent=self, g=self.goal)
+        return State(new_state, parent=self, g=self.goal, c=self.cost + 1)
 
     def display_possible_states(self):
         '''
@@ -129,12 +133,6 @@ class State:
                 return path
 
             current_state.find_next_states()
-            # print('Heuristic: ', current_state.heuristic,
-            #      'Steps left: ', max_steps, end='\t')
-            # print_state(current_state.state)
-            # time.sleep(1)
-            # current_state.display_possible_states()
-            # time.sleep(5)
 
             for next_state in current_state.next_states:
                 if next_state.state not in closed_list:
@@ -150,6 +148,66 @@ class State:
                     open_list.append(next_state)
 
             open_list.sort(key=lambda x: x.heuristic)
+
+        return None
+
+    def A_star_solve(self, heuristic_func: int, steps: int) -> list:
+        '''
+        Solves the puzzle using the A* algorithm
+        The heuristic function is determined based on the parameter heuristic_func
+        1: heuristic_1 -> Number of misplaced tiles
+        2: heuristic_2 -> Manhattan distance
+        3: heuristic_3 -> Manhattan distance + Number of misplaced tiles
+        '''
+        max_steps = steps
+        path = []
+        open_list = []
+        closed_list = []
+
+        # Set the initial state's heuristic value based on the selected heuristic function
+        if heuristic_func == 1:
+            self.heuristic = heuristic_1(self.state, self.goal)
+        elif heuristic_func == 2:
+            self.heuristic = heuristic_2(self.state, self.goal)
+        else:
+            self.heuristic = heuristic_3(self.state, self.goal)
+
+        open_list.append(self)
+
+        while open_list and max_steps > 0:
+            max_steps -= 1
+            current_state = open_list.pop(0)
+            closed_list.append(current_state.state)
+
+            if current_state.state == current_state.goal:
+                path.append(current_state)
+                while current_state.parent:
+                    path.append(current_state.parent)
+                    current_state = current_state.parent
+                path.reverse()
+                return path
+
+            current_state.find_next_states()
+
+            for next_state in current_state.next_states:
+                next_state_cost = current_state.cost + 1
+
+                if next_state.state not in closed_list or next_state_cost < next_state.cost:
+                    next_state.cost = next_state_cost
+                    if heuristic_func == 1:
+                        next_state.heuristic = heuristic_1(
+                            next_state.state, next_state.goal)
+                    elif heuristic_func == 2:
+                        next_state.heuristic = heuristic_2(
+                            next_state.state, next_state.goal)
+                    else:
+                        next_state.heuristic = heuristic_3(
+                            next_state.state, next_state.goal)
+                    next_state.f_value = next_state.cost + next_state.heuristic
+                    open_list.append(next_state)
+
+            # Sort the open list based on the f(n) value
+            open_list.sort(key=lambda x: x.f_value)
 
         return None
 
@@ -211,19 +269,28 @@ def parse_input(user_input):
 
 def best_search_loop():
     '''
-    Main loop of the program
+    loop for best search algorithm
     '''
+    terminal = 'terminal'
     while True:
         # Get user input
         # Wrap explanation text in a box
-        print('+' + '-'*38 + '+')
+        print('\n+' + '-'*38 + '+')
         print(
             'Enter the initial state and goal state and Heuristic function (1,2,3): [q to quit to menu] ')
         print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1')
         print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 2')
         print('If you want the visualization of the puzzle in the saved file, please end input with "v"')
+        print(
+            f'Currently printing to {terminal} (\'f\' to toggle file output)')
         print('+-' + '-'*36 + '-+')
         user_input = input('Input: ')
+        if user_input == 'f':
+            if terminal == 'terminal':
+                terminal = 'file'
+            else:
+                terminal = 'terminal'
+            continue
         if user_input == 'q':
             return
         states = parse_input(user_input)
@@ -234,7 +301,6 @@ def best_search_loop():
         flag = states[3]
         initial_state = State(states[0], None, goal_state, None)
 
-        # Check if the puzzle is solvable
         if not is_solvable(initial_state.state, goal_state):
             print('+' + '-'*38 + '+')
             print('|' + ' '*38 + '|')
@@ -247,7 +313,7 @@ def best_search_loop():
         # initial_state.display_possible_states()
         # print_state(initial_state.state)
 
-        path = initial_state.best_search_solve(heuristic_val, 1500)
+        path = initial_state.best_search_solve(heuristic_val, 3000)
         if path == None:
             print('No solution found.')
             continue
@@ -260,25 +326,123 @@ def best_search_loop():
             file_name += '-' + str(heuristic_val) + '.txt'
 
             print('Solution found!')
-            if flag:
-                file_name = 'visual_' + file_name
+            if terminal == 'file':
+                if flag:
+                    file_name = 'visual_' + file_name
 
-                if os.path.exists(file_name):
-                    os.remove(file_name)
-                for i in range(len(path)):
+                    if os.path.exists(file_name):
+                        os.remove(file_name)
+                    for i in range(len(path)):
+                        with open(file_name, 'a') as f:
+                            print_state_file(path[i].state, f)
                     with open(file_name, 'a') as f:
-                        print_state_file(path[i].state, f)
+                        f.write('Solution found in ' +
+                                str(len(path)-1) + ' steps.')
+                else:
+                    if os.path.exists(file_name):
+                        os.remove(file_name)
+
+                    for i in range(len(path)):
+                        with open(file_name, 'a') as f:
+                            f.write(str(path[i].state) + '\n')
+                    with open(file_name, 'a') as f:
+                        f.write('Solution found in ' +
+                                str(len(path)-1) + ' steps.')
+                print('Solution saved to', file_name)
             else:
-                # check if file exists, if so delete it
-
-                if os.path.exists(file_name):
-                    os.remove(file_name)
-
                 for i in range(len(path)):
-                    with open(file_name, 'a') as f:
-                        f.write(str(path[i].state) + '\n')
+                    print_state(path[i].state)
             print('Solution found in', len(path)-1, 'steps.')
-            print('Solution saved to', file_name)
+            print('')
+
+
+def A_star_loop():
+    '''
+    loop for A* search algorithm
+
+    Same as best_search_loop but uses A* algorithm. I could have combined the two into one loop and seperated the algorithm calls
+    but I got lazy and didn't want to take longer to do it.
+    '''
+    terminal = 'terminal'
+    while True:
+        print('\n+' + '-'*38 + '+')
+        print(
+            'Enter the initial state and goal state and Heuristic function (1,2,3): [q to quit to menu] ')
+        print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1')
+        print('Ex: (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 2')
+        print('If you want the visualization of the puzzle in the saved file, please end input with "v"')
+        print(
+            f'Currently printing to {terminal} (\'f\' to toggle file output)')
+        print('+-' + '-'*36 + '-+')
+        user_input = input('Input: ')
+        if user_input == 'f':
+            if terminal == 'terminal':
+                terminal = 'file'
+            else:
+                terminal = 'terminal'
+            continue
+        if user_input == 'q':
+            return
+        states = parse_input(user_input)
+        if states == None:
+            continue
+        goal_state = states[1]
+        heuristic_val = states[2]
+        flag = states[3]
+        initial_state = State(states[0], None, goal_state, None)
+
+        if not is_solvable(initial_state.state, goal_state):
+            print('+' + '-'*38 + '+')
+            print('|' + ' '*38 + '|')
+            print('|' + ' '*14 + 'NOT SOLVABLE' + ' '*12 + '|')
+            print('|' + ' '*14 + 'TRY ANOTHER!' + ' '*12 + '|')
+            print('+' + '-'*38 + '+')
+            continue
+
+        # initial_state.find_next_states()
+        # initial_state.display_possible_states()
+        # print_state(initial_state.state)
+
+        path = initial_state.A_star_solve(heuristic_val, 3000)
+        if path == None:
+            print('No solution found.')
+            continue
+        else:
+            '''Save the solution to a txt file'''
+            file_name = 'A_STAR_' + str(initial_state.state).strip(
+                '[]').replace(',', '').replace(' ', '')
+            file_name += '-' + \
+                str(goal_state).strip('[]').replace(',', '').replace(' ', '')
+            file_name += '-' + str(heuristic_val) + '.txt'
+
+            print('Solution found!')
+            if terminal == 'file':
+                if flag:
+                    file_name = 'visual_' + file_name
+
+                    if os.path.exists(file_name):
+                        os.remove(file_name)
+                    for i in range(len(path)):
+                        with open(file_name, 'a') as f:
+                            print_state_file(path[i].state, f)
+                    with open(file_name, 'a') as f:
+                        f.write('Solution found in ' +
+                                str(len(path)-1) + ' steps.')
+                else:
+                    if os.path.exists(file_name):
+                        os.remove(file_name)
+
+                    for i in range(len(path)):
+                        with open(file_name, 'a') as f:
+                            f.write(str(path[i].state) + '\n')
+                    with open(file_name, 'a') as f:
+                        f.write('Solution found in ' +
+                                str(len(path)-1) + ' steps.')
+                print('Solution saved to', file_name)
+            else:
+                for i in range(len(path)):
+                    print_state(path[i].state)
+            print('Solution found in', len(path)-1, 'steps.')
             print('')
 
 
@@ -363,7 +527,6 @@ def heuristic_3(state, goal):
 
 def main():
 
-    # User can select best search or A* algorithm
     user_input = ''
     while user_input != 'q':
         print('Welcome to the 8 state puzzle solver!')
@@ -382,7 +545,10 @@ def main():
         if user_input == '1':
             best_search_loop()
         elif user_input == '2':
-            print('A* Algorithm to be implemented.')
+            A_star_loop()
+        elif user_input == 'q':
+            print('Goodbye!')
+            return
         else:
             print('+' + '-'*38 + '+')
             print('|' + ' '*38 + '|')
