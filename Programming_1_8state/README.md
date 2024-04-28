@@ -6,9 +6,9 @@ This Python script provides a solution for the 8 state puzzle, a variant of the 
 
 - Solves the 8 state puzzle using two algorithms: Best Search and A\* Algorithm.
 - Three heuristic functions available:
-  - Number of misplaced tiles
-  - Manhattan distance
-  - Manhattan distance + Number of misplaced tiles
+  1. Number of misplaced tiles
+  2. Manhattan distance
+  3. Manhattan distance + Number of misplaced tiles
 - Determines if the puzzle is solvable based on the number of inversions.
 - Provides an option to save the solution path to a text file.
 - Visualization of the puzzle can be included in the saved file.
@@ -31,7 +31,7 @@ This Python script provides a solution for the 8 state puzzle, a variant of the 
 
 Example inputs:
 
-```
+```bash
 (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 1
 (7,2,4,5,b,6,8,3,1) (b,1,2,3,4,5,6,7,8) 2 v
 (1,3,4,6,7,8,2,5,b) (1,2,3,4,5,6,7,8,b) 3
@@ -41,3 +41,12 @@ Example inputs:
 
 - The solution path will be displayed in the terminal or saved to a text file.
 - If saved to a file, the filename format is: `initial_state-goal_state-Heuristic.txt`.
+
+## Note
+
+By default, the maximum number of iterations is set to 3000. This can be changed by modifying the `MAX_ITERATIONS` constant in the script.
+
+## Author
+
+Jacob Campbell
+Spring 2024 - CS441

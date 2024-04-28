@@ -27,6 +27,8 @@ import random
 import time
 import os
 
+MAX_ITERATIONS = 3000
+
 #################################################
 # Class for State of the puzzle and its methods #
 #################################################
@@ -313,7 +315,7 @@ def best_search_loop():
         # initial_state.display_possible_states()
         # print_state(initial_state.state)
 
-        path = initial_state.best_search_solve(heuristic_val, 3000)
+        path = initial_state.best_search_solve(heuristic_val, MAX_ITERATIONS)
         if path == None:
             print('No solution found.')
             continue
@@ -403,7 +405,7 @@ def A_star_loop():
         # initial_state.display_possible_states()
         # print_state(initial_state.state)
 
-        path = initial_state.A_star_solve(heuristic_val, 3000)
+        path = initial_state.A_star_solve(heuristic_val, MAX_ITERATIONS)
         if path == None:
             print('No solution found.')
             continue
@@ -440,8 +442,12 @@ def A_star_loop():
                                 str(len(path)-1) + ' steps.')
                 print('Solution saved to', file_name)
             else:
-                for i in range(len(path)):
-                    print_state(path[i].state)
+                if flag:
+                    for i in range(len(path)):
+                        print_state(path[i].state)
+                else:
+                    for i in range(len(path)):
+                        print(path[i].state)
             print('Solution found in', len(path)-1, 'steps.')
             print('')
 
