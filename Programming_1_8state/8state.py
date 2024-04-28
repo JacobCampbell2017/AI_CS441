@@ -262,10 +262,18 @@ def best_search_loop():
             print('Solution found!')
             if flag:
                 file_name = 'visual_' + file_name
+
+                if os.path.exists(file_name):
+                    os.remove(file_name)
                 for i in range(len(path)):
                     with open(file_name, 'a') as f:
                         print_state_file(path[i].state, f)
             else:
+                # check if file exists, if so delete it
+
+                if os.path.exists(file_name):
+                    os.remove(file_name)
+
                 for i in range(len(path)):
                     with open(file_name, 'a') as f:
                         f.write(str(path[i].state) + '\n')
